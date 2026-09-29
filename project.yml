@@ -1,0 +1,72 @@
+name: S400WakeProbe
+options:
+  createIntermediateGroups: true
+  deploymentTarget:
+    iOS: "17.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    SUPPORTS_MACCATALYST: NO
+    CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: "0.5.1"
+    CURRENT_PROJECT_VERSION: "15"
+targets:
+  CryptoSwift:
+    type: framework
+    platform: iOS
+    sources:
+      - path: Vendor/CryptoSwift/Sources/CryptoSwift
+      - path: Vendor/CryptoSwift/Sources/CryptoSwiftResources/PrivacyInfo.xcprivacy
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.example.s400nogateway.cryptoswift
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+  S400WakeProbe:
+    type: application
+    platform: iOS
+    dependencies:
+      - target: CryptoSwift
+    sources:
+      - path: S400WakeProbe
+      - path: Sources/ProbeCore
+    settings:
+      base:
+        S400_APP_BUNDLE_ID: org.example.s400nogateway
+        PRODUCT_BUNDLE_IDENTIFIER: $(S400_APP_BUNDLE_ID)
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_ENTITLEMENTS: S400WakeProbe/Resources/S400WakeProbe.entitlements
+    info:
+      path: S400WakeProbe/Resources/Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDisplayName: S400但没有蓝牙网关也不要慌张
+        CFBundleIcons:
+          CFBundlePrimaryIcon:
+            CFBundleIconFiles:
+              - AppIcon60
+            UIPrerenderedIcon: true
+        CFBundleIconFiles:
+          - AppIcon60
+        NSBluetoothAlwaysUsageDescription: 连接你选择的体脂秤，在附近自动接收称重结果。
+        NSHealthUpdateUsageDescription: 将你本人的称重结果自动写入 Apple 健康，包括体重、BMI 和已核对的身体指标。
+        NSHealthShareUsageDescription: 本 App 不读取你的健康历史，称重结果来自你选择的 S400。
+        UIBackgroundModes:
+          - bluetooth-central
+        UILaunchScreen: {}
+        UIRequiresFullScreen: true
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+schemes:
+  S400WakeProbe:
+    build:
+      targets:
+        S400WakeProbe: all
+    run:
+      config: Debug
+    archive:
+      config: Release
